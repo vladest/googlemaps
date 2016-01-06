@@ -1,0 +1,12 @@
+{
+    "Keys": ["googlemaps"],
+    "Provider": "googlemaps",
+    "Version": 100,
+    "Experimental": false,
+    "Features": [
+        "OnlineGeocodingFeature",
+        "ReverseGeocodingFeature",
+        "OnlineRoutingFeature",
+        "OnlinePlacesFeature"
+    ]
+}
