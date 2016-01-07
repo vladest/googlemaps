@@ -158,7 +158,7 @@ void QGeoRouteReplyGooglemaps::networkReplyFinished()
             QByteArray routeGeometry = o.value(QStringLiteral("overview_polyline")).
                     toObject().value(QStringLiteral("points")).toString().toLatin1();
             QList<QGeoCoordinate> path = parsePolyline(routeGeometry);
-            route.setPath(path);
+
 
             QJsonObject bo = o.value(QStringLiteral("bounds")).toObject();
             QJsonObject ne_loc_o = bo.value(QStringLiteral("northeast")).toObject();
@@ -168,17 +168,14 @@ void QGeoRouteReplyGooglemaps::networkReplyFinished()
             route.setBounds(r);
 
             QJsonArray legs = o.value(QStringLiteral("legs")).toArray();
-            //usually one, but...
-            qDebug() << "legs:" <<legs.size();
+            QGeoRouteSegment firstSegment;
+            QGeoRouteSegment prevSegment;
             for(int l = 0; l < legs.size(); l++) {
                 QJsonObject lego = legs.at(l).toObject();
                 route.setDistance(lego.value("distance").toObject().value("value").toDouble());
                 route.setTravelTime(lego.value("duration").toObject().value("value").toInt());
 
                 QJsonArray steps = lego.value(QStringLiteral("steps")).toArray();
-                qDebug() << "steps:" << steps.size();
-                QGeoRouteSegment firstSegment;
-                QGeoRouteSegment prevSegment;
 
                 for(int s = 0; s < steps.size(); s++) {
                     QJsonObject stepo = steps.at(s).toObject();
@@ -194,8 +191,6 @@ void QGeoRouteReplyGooglemaps::networkReplyFinished()
                     QList<QGeoCoordinate> steppath = parsePolyline(stepGeometry);
                     QString directionCode = stepo.value("maneuver").toString();
 
-                    qDebug() << "dist" << distance;
-                    segment.setDistance(distance);
                     maneuver.setDirection(gmapsInstructionDirection(directionCode));
                     maneuver.setDistanceToNextInstruction(distance);
                     maneuver.setInstructionText(instructionText);
@@ -203,19 +198,21 @@ void QGeoRouteReplyGooglemaps::networkReplyFinished()
                         maneuver.setPosition(steppath.at(0));
                     maneuver.setTimeToNextInstruction(segmentTime);
 
+                    segment.setDistance(distance);
                     segment.setManeuver(maneuver);
                     segment.setPath(steppath);
                     segment.setTravelTime(segmentTime);
 
-                    if (s == 0) {
+                    if (s == 0 && l == 0) {
                         firstSegment = segment;
                     }
                     if (prevSegment.isValid())
                         prevSegment.setNextRouteSegment(segment);
                     prevSegment = segment;
                 }
-                route.setFirstRouteSegment(firstSegment);
             }
+            route.setFirstRouteSegment(firstSegment);
+            route.setPath(path);
             routes.append(route);
         }
 
