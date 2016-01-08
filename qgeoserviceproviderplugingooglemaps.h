@@ -1,5 +1,5 @@
-#ifndef QGEOSERVICEPROVIDER_GOOGLEMAPS_H
-#define QGEOSERVICEPROVIDER_GOOGLEMAPS_H
+#ifndef QGEOSERVICEPROVIDERGOOGLEMAPS_H
+#define QGEOSERVICEPROVIDERGOOGLEMAPS_H
 
 #include <QtCore/QObject>
 #include <QtLocation/QGeoServiceProviderFactory>
@@ -21,6 +21,10 @@ public:
     QPlaceManagerEngine *createPlaceManagerEngine(const QVariantMap &parameters,
                                                   QGeoServiceProvider::Error *error,
                                                   QString *errorString) const;
+    QGeoMappingManagerEngine *createMappingManagerEngine(const QVariantMap &parameters,
+                                                         QGeoServiceProvider::Error *error,
+                                                         QString *errorString) const;
+
 };
 
 #endif

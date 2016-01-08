@@ -13,7 +13,11 @@ HEADERS += \
     qgeoroutereplygooglemaps.h \
     qplacemanagerenginegooglemaps.h \
     qplacesearchreplygooglemaps.h \
-    qplacecategoriesreplygooglemaps.h
+    qplacecategoriesreplygooglemaps.h \
+    qgeomapreplygooglemaps.h \
+    qgeotiledmapgooglemaps.h \
+    qgeotiledmappingmanagerenginegooglemaps.h \
+    qgeotilefetchergooglemaps.h
 
 SOURCES += \
     qgeoserviceproviderplugingooglemaps.cpp \
@@ -23,7 +27,11 @@ SOURCES += \
     qgeoroutereplygooglemaps.cpp \
     qplacemanagerenginegooglemaps.cpp \
     qplacesearchreplygooglemaps.cpp \
-    qplacecategoriesreplygooglemaps.cpp
+    qplacecategoriesreplygooglemaps.cpp \
+    qgeomapreplygooglemaps.cpp \
+    qgeotiledmapgooglemaps.cpp \
+    qgeotiledmappingmanagerenginegooglemaps.cpp \
+    qgeotilefetchergooglemaps.cpp
 
 
 OTHER_FILES += \

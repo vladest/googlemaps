@@ -7,6 +7,8 @@
         "OnlineGeocodingFeature",
         "ReverseGeocodingFeature",
         "OnlineRoutingFeature",
-        "OnlinePlacesFeature"
+        "AlternativeRoutesFeature",
+        "OnlinePlacesFeature",
+        "OnlineMappingFeature"
     ]
 }

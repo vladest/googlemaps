@@ -2,6 +2,8 @@
 #include "qgeocodingmanagerenginegooglemaps.h"
 #include "qgeoroutingmanagerenginegooglemaps.h"
 #include "qplacemanagerenginegooglemaps.h"
+#include "qgeotiledmappingmanagerenginegooglemaps.h"
+
 
 QGeoCodingManagerEngine *QGeoServiceProviderFactoryGooglemaps::createGeocodingManagerEngine(
     const QVariantMap &parameters, QGeoServiceProvider::Error *error, QString *errorString) const
@@ -19,4 +21,12 @@ QPlaceManagerEngine *QGeoServiceProviderFactoryGooglemaps::createPlaceManagerEng
     const QVariantMap &parameters, QGeoServiceProvider::Error *error, QString *errorString) const
 {
     return new QPlaceManagerEngineGooglemaps(parameters, error, errorString);
+}
+
+QGeoMappingManagerEngine *QGeoServiceProviderFactoryGooglemaps::createMappingManagerEngine(
+        const QVariantMap &parameters,
+        QGeoServiceProvider::Error *error,
+        QString *errorString) const
+{
+    return new QGeoTiledMappingManagerEngineGooglemaps(parameters, error, errorString);
 }
