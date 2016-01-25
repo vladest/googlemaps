@@ -1,5 +1,5 @@
 #include "qgeoroutereplygooglemaps.h"
-
+#include <QDebug>
 #include <QGeoRectangle>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
