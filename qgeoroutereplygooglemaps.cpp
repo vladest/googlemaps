@@ -194,8 +194,10 @@ void QGeoRouteReplyGooglemaps::networkReplyFinished()
                     maneuver.setDirection(gmapsInstructionDirection(directionCode));
                     maneuver.setDistanceToNextInstruction(distance);
                     maneuver.setInstructionText(instructionText);
-                    if (steppath.size() > 0)
+                    if (steppath.size() > 0) {
                         maneuver.setPosition(steppath.at(0));
+                        maneuver.setWaypoint(steppath.at(0));
+                    }
                     maneuver.setTimeToNextInstruction(segmentTime);
 
                     segment.setDistance(distance);

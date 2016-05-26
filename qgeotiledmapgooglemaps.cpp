@@ -1,6 +1,8 @@
 #include "qgeotiledmapgooglemaps.h"
 #include "qgeotiledmappingmanagerenginegooglemaps.h"
+#if QT_VERSION <= QT_VERSION_CHECK(5,6,0)
 #include "QtLocation/private/qgeomapcontroller_p.h"
+#endif
 
 #include <QDebug>
 #include <QObject>

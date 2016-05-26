@@ -32,3 +32,14 @@ Makefile*
 #QtCtreator Qml
 *.qmlproject.user
 *.qmlproject.user.*
+*.user
+.moc/
+.obj/
+mkspecs/
+lib/
+*.dll
+*.rc
+object_script.qtgeoservices_ors.Release
+object_script.qtgeoservices_orsd.Debug
+object_script.qtgeoservices_googlemaps.Release
+object_script.qtgeoservices_googlemapsd.Debug

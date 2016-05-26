@@ -100,6 +100,12 @@ QGeoTileFetcherGooglemaps::QGeoTileFetcherGooglemaps(const QVariantMap &paramete
     _secGoogleWord               = "Galileo";
 
     _tryCorrectGoogleVersions(m_networkManager);
+
+    netRequest.setAttribute(QNetworkRequest::HttpPipeliningAllowedAttribute, true);
+    netRequest.setRawHeader("Referrer", "http://maps.google.com/");
+    netRequest.setRawHeader("Accept", "*/*");
+    netRequest.setRawHeader("User-Agent", _userAgent);
+
 }
 
 QGeoTileFetcherGooglemaps::~QGeoTileFetcherGooglemaps()
@@ -117,12 +123,7 @@ QGeoTiledMapReply *QGeoTileFetcherGooglemaps::getTileImage(const QGeoTileSpec &s
     QString surl = _getURL(spec.mapId(), spec.x(), spec.y(), spec.zoom());
     QUrl url(surl);
     //qDebug() << "maps url:" << url;
-    QNetworkRequest netRequest(url); // The extra pair of parens disambiguates this from a function declaration
-    netRequest.setAttribute(QNetworkRequest::HttpPipeliningAllowedAttribute, true);
-    netRequest.setRawHeader("Referrer", "http://maps.google.com/");
-    netRequest.setRawHeader("Accept", "*/*");
-    netRequest.setRawHeader("User-Agent", _userAgent);
-
+    netRequest.setUrl(url); // The extra pair of parens disambiguates this from a function declaration
 
     QNetworkReply *netReply = m_networkManager->get(netRequest);
 

@@ -61,6 +61,8 @@ private:
     QString         _versionGoogleLabels;
     QString         _versionGoogleTerrain;
     QString         _secGoogleWord;
+
+    QNetworkRequest netRequest;
 };
 
 QT_END_NAMESPACE
