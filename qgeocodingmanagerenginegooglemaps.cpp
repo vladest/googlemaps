@@ -14,27 +14,32 @@
 
 static QString addressToQuery(const QGeoAddress &address)
 {
-    return address.street() + QStringLiteral(", ") +
-           address.district() + QStringLiteral(", ") +
-           address.city() + QStringLiteral(", ") +
-           address.state() + QStringLiteral(", ") +
-           address.country();
+    return address.street() + QStringLiteral(",+") +
+            address.district() + QStringLiteral(",+") +
+            address.city() + QStringLiteral(",+") +
+            address.state() + QStringLiteral(",+") +
+            address.country();
+}
+
+static QString coordinateToQuery(const QGeoCoordinate &coordinate)
+{
+    return QString::number(coordinate.latitude()) + QStringLiteral(",") +
+           QString::number(coordinate.longitude());
 }
 
 QGeoCodingManagerEngineGooglemaps::QGeoCodingManagerEngineGooglemaps(const QVariantMap &parameters,
-                                                       QGeoServiceProvider::Error *error,
-                                                       QString *errorString)
-:   QGeoCodingManagerEngine(parameters), m_networkManager(new QNetworkAccessManager(this))
+                                                                     QGeoServiceProvider::Error *error,
+                                                                     QString *errorString)
+    :   QGeoCodingManagerEngine(parameters), m_networkManager(new QNetworkAccessManager(this))
 {
-    if (parameters.contains(QStringLiteral("ors.useragent")))
-        m_userAgent = parameters.value(QStringLiteral("ors.useragent")).toString().toLatin1();
+    if (parameters.contains(QStringLiteral("googlemaps.useragent")))
+        m_userAgent = parameters.value(QStringLiteral("googlemaps.useragent")).toString().toLatin1();
     else
         m_userAgent = "Qt Location based application";
 
-    if (parameters.contains(QStringLiteral("ors.geocoding.host")))
-        m_urlPrefix = parameters.value(QStringLiteral("ors.geocoding.host")).toString().toLatin1();
-    else
-        m_urlPrefix = QStringLiteral("http://openls.geog.uni-heidelberg.de");
+    m_apiKey = parameters.value(QStringLiteral("googlemaps.geocode.apikey")).toString();
+
+    m_urlPrefix = QStringLiteral("https://maps.googleapis.com/maps/api/geocode/json");
 
     *error = QGeoServiceProvider::NoError;
     errorString->clear();
@@ -52,19 +57,22 @@ QGeoCodeReply *QGeoCodingManagerEngineGooglemaps::geocode(const QGeoAddress &add
 QGeoCodeReply *QGeoCodingManagerEngineGooglemaps::geocode(const QString &address, int limit, int offset, const QGeoShape &bounds)
 {
     Q_UNUSED(offset)
-    Q_UNUSED(bounds)
+    Q_UNUSED(limit)
 
     QNetworkRequest request;
     request.setRawHeader("User-Agent", m_userAgent);
 
-    QUrl url(QString("%1/geocode").arg(m_urlPrefix));
+    QUrl url(m_urlPrefix);
     QUrlQuery query;
-    query.addQueryItem(QStringLiteral("FreeFormAdress"), address);
-    if (limit != -1)
-        query.addQueryItem(QStringLiteral("MaxResponse"), QString::number(limit));
-    else
-        query.addQueryItem(QStringLiteral("MaxResponse"), QString::number(20));
-
+    query.addQueryItem(QStringLiteral("address"), address);
+    query.addQueryItem(QStringLiteral("key"), m_apiKey);
+    if (bounds.isValid() && !bounds.isEmpty() && bounds.type() != QGeoShape::UnknownType) {
+        if (bounds.type() == QGeoShape::RectangleType) {
+            const QGeoRectangle &r = static_cast<const QGeoRectangle&>(bounds);
+            query.addQueryItem(QStringLiteral("bounds"),
+                               (coordinateToQuery(r.topRight()) + "|" + coordinateToQuery(r.bottomLeft())));
+        }
+    }
     url.setQuery(query);
     request.setUrl(url);
 
@@ -80,18 +88,17 @@ QGeoCodeReply *QGeoCodingManagerEngineGooglemaps::geocode(const QString &address
 }
 
 QGeoCodeReply *QGeoCodingManagerEngineGooglemaps::reverseGeocode(const QGeoCoordinate &coordinate,
-                                                          const QGeoShape &bounds)
+                                                                 const QGeoShape &bounds)
 {
     Q_UNUSED(bounds)
 
     QNetworkRequest request;
     request.setRawHeader("User-Agent", m_userAgent);
 
-    QUrl url(QString("%1/geocode").arg(m_urlPrefix));
+    QUrl url(m_urlPrefix);
     QUrlQuery query;
-    query.addQueryItem(QStringLiteral("lat"), QString::number(coordinate.latitude()));
-    query.addQueryItem(QStringLiteral("lon"), QString::number(coordinate.longitude()));
-    query.addQueryItem(QStringLiteral("MaxResponse"), QString::number(20)); //TODO: any parameter for this?
+    query.addQueryItem(QStringLiteral("latlng"), coordinateToQuery(coordinate));
+    query.addQueryItem(QStringLiteral("key"), m_apiKey);
 
     url.setQuery(query);
     request.setUrl(url);
