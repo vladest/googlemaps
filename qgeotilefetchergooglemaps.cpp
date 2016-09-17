@@ -12,6 +12,8 @@
 #include <QTime>
 #include <QNetworkProxy>
 
+#include <math.h>
+
 #include <map>
 
 QT_BEGIN_NAMESPACE
