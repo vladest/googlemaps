@@ -78,7 +78,8 @@ QGeoTileFetcherGooglemaps::QGeoTileFetcherGooglemaps(const QVariantMap &paramete
 :   QGeoTileFetcher(engine),
   m_networkManager(new QNetworkAccessManager(this)),
   m_engineGooglemaps(engine),
-  m_tileSize(tileSize)
+  m_tileSize(tileSize),
+  _googleVersionRetrieved(false)
 {
     m_apiKey = parameters.value(QStringLiteral("googlemaps.maps.apikey")).toString();
     m_signature = parameters.value(QStringLiteral("googlemaps.maps.signature")).toString();
@@ -95,16 +96,15 @@ QGeoTileFetcherGooglemaps::QGeoTileFetcherGooglemaps(const QVariantMap &paramete
     }
 
     // Google version strings
-    _versionGoogleMap            = "m@336";
-    _versionGoogleSatellite      = "194";
+    _versionGoogleMap            = "m@338000000";
+    _versionGoogleSatellite      = "198";
     _versionGoogleLabels         = "h@336";
-    _versionGoogleTerrain        = "t@132,r@336";
+    _versionGoogleTerrain        = "t@132,r@338000000";
     _secGoogleWord               = "Galileo";
 
     _tryCorrectGoogleVersions(m_networkManager);
 
-    netRequest.setAttribute(QNetworkRequest::HttpPipeliningAllowedAttribute, true);
-    netRequest.setRawHeader("Referrer", "http://maps.google.com/");
+    netRequest.setRawHeader("Referrer", "https://www.google.com/maps/preview");
     netRequest.setRawHeader("Accept", "*/*");
     netRequest.setRawHeader("User-Agent", _userAgent);
 
@@ -124,7 +124,7 @@ QGeoTiledMapReply *QGeoTileFetcherGooglemaps::getTileImage(const QGeoTileSpec &s
     }
     QString surl = _getURL(spec.mapId(), spec.x(), spec.y(), spec.zoom());
     QUrl url(surl);
-    //qDebug() << "maps url:" << url;
+
     netRequest.setUrl(url); // The extra pair of parens disambiguates this from a function declaration
 
     QNetworkReply *netReply = m_networkManager->get(netRequest);
@@ -157,7 +157,6 @@ QString QGeoTileFetcherGooglemaps::_getURL(int type, int x, int y, int zoom)
         QString sec1    = ""; // after &x=...
         QString sec2    = ""; // after &zoom=...
         _getSecGoogleWords(x, y, sec1, sec2);
-        //_tryCorrectGoogleVersions(networkManager);
         return QString("http://%1%2.google.com/%3/lyrs=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(_getServerNum(x, y, 4)).arg(request).arg(_versionGoogleMap).arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2);
     }
     break;
@@ -169,7 +168,6 @@ QString QGeoTileFetcherGooglemaps::_getURL(int type, int x, int y, int zoom)
         QString sec1    = ""; // after &x=...
         QString sec2    = ""; // after &zoom=...
         _getSecGoogleWords(x, y, sec1, sec2);
-        //_tryCorrectGoogleVersions(networkManager);
         return QString("http://%1%2.google.com/%3/v=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(_getServerNum(x, y, 4)).arg(request).arg(_versionGoogleSatellite).arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2);
     }
     break;
@@ -180,7 +178,6 @@ QString QGeoTileFetcherGooglemaps::_getURL(int type, int x, int y, int zoom)
         QString sec1    = ""; // after &x=...
         QString sec2    = ""; // after &zoom=...
         _getSecGoogleWords(x, y, sec1, sec2);
-        //_tryCorrectGoogleVersions(networkManager);
         return QString("http://%1%2.google.com/%3/lyrs=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(_getServerNum(x, y, 4)).arg(request).arg(_versionGoogleLabels).arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2);
     }
     break;
@@ -191,7 +188,6 @@ QString QGeoTileFetcherGooglemaps::_getURL(int type, int x, int y, int zoom)
         QString sec1    = ""; // after &x=...
         QString sec2    = ""; // after &zoom=...
         _getSecGoogleWords(x, y, sec1, sec2);
-        //_tryCorrectGoogleVersions(networkManager);
         return QString("http://%1%2.google.com/%3/v=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(_getServerNum(x, y, 4)).arg(request).arg(_versionGoogleTerrain).arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2);
     }
     break;
@@ -221,26 +217,23 @@ void QGeoTileFetcherGooglemaps::_googleVersionCompleted()
         return;
     }
     QString html = QString(_googleReply->readAll());
-    QRegExp reg("\"*http://mt0.google.com/vt/lyrs=m@(\\d*)",Qt::CaseInsensitive);
+
+    QRegExp reg("\"*https?://mt\\D?\\d..*/vt\\?lyrs=m@(\\d*)", Qt::CaseInsensitive);
     if (reg.indexIn(html) != -1) {
         QStringList gc = reg.capturedTexts();
         _versionGoogleMap = QString("m@%1").arg(gc[1]);
     }
-    reg = QRegExp("\"*http://mt0.google.com/vt/lyrs=h@(\\d*)",Qt::CaseInsensitive);
-    if (reg.indexIn(html) != -1) {
-        QStringList gc = reg.capturedTexts();
-        _versionGoogleLabels = QString("h@%1").arg(gc[1]);
-    }
-    reg = QRegExp("\"*http://khm\\D?\\d.google.com/kh/v=(\\d*)",Qt::CaseInsensitive);
+    reg = QRegExp("\"*https?://khm\\D?\\d.googleapis.com/kh\\?v=(\\d*)", Qt::CaseInsensitive);
     if (reg.indexIn(html) != -1) {
         QStringList gc = reg.capturedTexts();
         _versionGoogleSatellite = gc[1];
     }
-    reg = QRegExp("\"*http://mt0.google.com/vt/lyrs=t@(\\d*),r@(\\d*)",Qt::CaseInsensitive);
+    reg = QRegExp("\"*https?://mt\\D?\\d..*/vt\\?lyrs=t@(\\d*),r@(\\d*)", Qt::CaseInsensitive);
     if (reg.indexIn(html) != -1) {
         QStringList gc = reg.capturedTexts();
         _versionGoogleTerrain = QString("t@%1,r@%2").arg(gc[1]).arg(gc[2]);
     }
+
     _googleReply->deleteLater();
     _googleReply = NULL;
 }
@@ -258,13 +251,14 @@ void QGeoTileFetcherGooglemaps::_tryCorrectGoogleVersions(QNetworkAccessManager*
         QNetworkRequest qheader;
         QNetworkProxy proxy = networkManager->proxy();
         QNetworkProxy tProxy;
-        tProxy.setType(QNetworkProxy::NoProxy);
+        tProxy.setType(QNetworkProxy::DefaultProxy);
         networkManager->setProxy(tProxy);
-        QString url = "http://maps.google.com/maps";
+        QSslConfiguration conf = qheader.sslConfiguration();
+        conf.setPeerVerifyMode(QSslSocket::VerifyNone);
+        qheader.setSslConfiguration(conf);
+        QString url = "http://maps.google.com/maps/api/js?v=3.2&sensor=false";
         qheader.setUrl(QUrl(url));
-        QByteArray ua;
-        ua.append(_userAgent);
-        qheader.setRawHeader("User-Agent", ua);
+        qheader.setRawHeader("User-Agent", _userAgent);
         _googleReply = networkManager->get(qheader);
         connect(_googleReply, &QNetworkReply::finished, this, &QGeoTileFetcherGooglemaps::_googleVersionCompleted);
         connect(_googleReply, &QNetworkReply::destroyed, this, &QGeoTileFetcherGooglemaps::_replyDestroyed);
