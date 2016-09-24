@@ -21,50 +21,6 @@ QT_BEGIN_NAMESPACE
 namespace
 {
 
-    double tilex2long(int x, int z)
-    {
-        return (double)x / pow(2.0, z) * 360.0 - 180.0;
-    }
-
-    double tiley2lat(int y, int z)
-    {
-        double n = M_PI - 2.0 * M_PI * (double)y / pow(2.0, z);
-        return 180.0 / M_PI * atan(0.5 * (exp(n) - exp(-n)));
-    }
-
-    QGeoCoordinate xyzToCoord(int x, int y, int z)
-    {
-        return QGeoCoordinate(tiley2lat(y, z), tilex2long(x, z), 0.0);
-    }
-
-    QString sizeToStr(const QSize &size)
-    {
-        if (size.height() >= 512 || size.width() >= 512)
-            return QStringLiteral("512x512");
-        else if (size.height() >= 256 || size.width() >= 256)
-            return QStringLiteral("256x256");
-        else
-            return QStringLiteral("128x128");   // 128 pixel tiles are deprecated.
-    }
-
-    QGeoCoordinate tileCenter(const QGeoTileSpec &spec) {
-        int viewX0, viewY0, viewX1, viewY1;
-        viewX0 = spec.x();
-        viewY0 = spec.y();
-        viewX1 = spec.x() + 1;
-        viewY1 = spec.y() + 1;
-
-        QGeoRectangle viewport(xyzToCoord(viewX0, viewY0, spec.zoom()), xyzToCoord(viewX1, viewY1, spec.zoom()));
-        return viewport.center();
-    }
-
-    QString coordToStr(const QGeoCoordinate &coord)
-    {
-        //its important to have precision 8. otherwise tile will not be fitted correctly
-        char format = 'g';
-        return QString::number(coord.latitude(), format, 8) + "," + QString::number(coord.longitude(), format, 8);
-    }
-
     int _getServerNum(int x, int y, int max)
     {
         return (x + 2 * y) % max;
@@ -116,16 +72,10 @@ QGeoTileFetcherGooglemaps::~QGeoTileFetcherGooglemaps()
 
 QGeoTiledMapReply *QGeoTileFetcherGooglemaps::getTileImage(const QGeoTileSpec &spec)
 {
-
-    if (m_apiKey.isEmpty()) {
-        QGeoTiledMapReply *reply = new QGeoTiledMapReply(QGeoTiledMapReply::UnknownError, "Set googlemaps.maps.apikey with google maps application key, supporting static maps", this);
-        emit tileError(spec, reply->errorString());
-        return reply;
-    }
     QString surl = _getURL(spec.mapId(), spec.x(), spec.y(), spec.zoom());
     QUrl url(surl);
 
-    netRequest.setUrl(url); // The extra pair of parens disambiguates this from a function declaration
+    netRequest.setUrl(url);
 
     QNetworkReply *netReply = m_networkManager->get(netRequest);
 
