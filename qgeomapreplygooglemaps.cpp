@@ -46,7 +46,11 @@ void QGeoMapReplyGooglemaps::networkFinished()
         return;
 
     setMapImageData(m_reply->readAll());
-    setMapImageFormat("png");
+    const int _mid = tileSpec().mapId();
+    if (_mid == 2)
+        setMapImageFormat("jpeg");
+    else
+        setMapImageFormat("png");
     setFinished(true);
 
     m_reply->deleteLater();
