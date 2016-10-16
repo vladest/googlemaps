@@ -45,12 +45,18 @@ QGeoTiledMappingManagerEngineGooglemaps::QGeoTiledMappingManagerEngineGooglemaps
     QGeoTileFetcherGooglemaps *fetcher = new QGeoTileFetcherGooglemaps(parameters, this, tileSize());
     setTileFetcher(fetcher);
 
-    m_cacheDirectory = QAbstractGeoTileCache::baseCacheDirectory() + QLatin1String("googlemaps");
+    if (parameters.contains(QStringLiteral("googlemaps.cachefolder")))
+        m_cacheDirectory = parameters.value(QStringLiteral("googlemaps.cachefolder")).toString().toLatin1();
+    else
+        m_cacheDirectory = QAbstractGeoTileCache::baseCacheDirectory() + QLatin1String("googlemaps");
 
     QAbstractGeoTileCache *tileCache = new QGeoFileTileCache(m_cacheDirectory);
+    tileCache->setMaxDiskUsage(100 * 1024 * 1024);
     setTileCache(tileCache);
 
     populateMapSchemes();
+    *error = QGeoServiceProvider::NoError;
+    errorString->clear();
 }
 
 QGeoTiledMappingManagerEngineGooglemaps::~QGeoTiledMappingManagerEngineGooglemaps()

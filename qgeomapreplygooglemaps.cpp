@@ -59,12 +59,12 @@ void QGeoMapReplyGooglemaps::networkFinished()
 
 void QGeoMapReplyGooglemaps::networkError(QNetworkReply::NetworkError error)
 {
+    Q_UNUSED(error);
     if (!m_reply)
         return;
 
-    if (error != QNetworkReply::OperationCanceledError)
-        setError(QGeoTiledMapReply::CommunicationError, m_reply->errorString());
     setFinished(true);
+    setCached(false);
     m_reply->deleteLater();
     m_reply = 0;
 }
