@@ -155,10 +155,7 @@ void QGeoRouteReplyGooglemaps::networkReplyFinished()
 
             QJsonObject o = jsonroutes.at(i).toObject();
 
-            QByteArray routeGeometry = o.value(QStringLiteral("overview_polyline")).
-                    toObject().value(QStringLiteral("points")).toString().toLatin1();
-            QList<QGeoCoordinate> path = parsePolyline(routeGeometry);
-
+            QList<QGeoCoordinate> path;
 
             QJsonObject bo = o.value(QStringLiteral("bounds")).toObject();
             QJsonObject ne_loc_o = bo.value(QStringLiteral("northeast")).toObject();
@@ -190,6 +187,8 @@ void QGeoRouteReplyGooglemaps::networkReplyFinished()
                             toObject().value(QStringLiteral("points")).toString().toLatin1();
                     QList<QGeoCoordinate> steppath = parsePolyline(stepGeometry);
                     QString directionCode = stepo.value("maneuver").toString();
+
+                    path += steppath;
 
                     maneuver.setDirection(gmapsInstructionDirection(directionCode));
                     maneuver.setDistanceToNextInstruction(distance);
