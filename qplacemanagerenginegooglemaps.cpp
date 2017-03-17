@@ -1,6 +1,7 @@
 #include "qplacemanagerenginegooglemaps.h"
 #include "qplacesearchreplygooglemaps.h"
 #include "qplacecategoriesreplygooglemaps.h"
+#include "qplacesearchsuggestionreplyimpl.h"
 
 #include <QtCore/QUrlQuery>
 #include <QtCore/QXmlStreamReader>
@@ -53,21 +54,51 @@ QString nameForTagKey(const QString &tagKey)
 
 }
 
+
+static bool addAtForBoundingArea(const QGeoShape &area,
+                                 QUrlQuery *queryItems)
+{
+    QGeoCoordinate center = area.center();
+    if (!center.isValid())
+        return false;
+
+    queryItems->addQueryItem(QStringLiteral("location"),
+                             QString::number(center.latitude()) +
+                             QLatin1Char(',') +
+                             QString::number(center.longitude()));
+    // for google maps the shape has to be a circle
+    QGeoCircle* cirle = new QGeoCircle(area);
+    if(cirle != NULL)
+    {
+        qreal radiusCorrected = cirle->radius();
+        if(radiusCorrected < 1)
+            radiusCorrected = 1;
+        queryItems->addQueryItem(QStringLiteral("radius"),
+                                 QString::number(radiusCorrected));
+    }
+    return true;
+}
+
 QPlaceManagerEngineGooglemaps::QPlaceManagerEngineGooglemaps(const QVariantMap &parameters,
                                                QGeoServiceProvider::Error *error,
                                                QString *errorString)
 :   QPlaceManagerEngine(parameters), m_networkManager(new QNetworkAccessManager(this)),
     m_categoriesReply(0)
 {
-    if (parameters.contains(QStringLiteral("ors.useragent")))
-        m_userAgent = parameters.value(QStringLiteral("ors.useragent")).toString().toLatin1();
-    else
-        m_userAgent = "Qt Location based application";
+//    if (parameters.contains(QStringLiteral("ors.useragent")))
+//        m_userAgent = parameters.value(QStringLiteral("ors.useragent")).toString().toLatin1();
+//    else
+//        m_userAgent = "Qt Location based application";
 
-    if (parameters.contains(QStringLiteral("Ors.places.host")))
-        m_urlPrefix = parameters.value(QStringLiteral("Ors.places.host")).toString();
+    if (parameters.contains(QStringLiteral("googlemaps.places.apikey")))
+        m_apiKey = parameters.value(QStringLiteral("googlemaps.places.apikey")).toString().toLatin1();
     else
-        m_urlPrefix = QStringLiteral("http://nominatim.openstreetmap.org/search");
+        m_apiKey = parameters.value(QStringLiteral("googlemaps.apikey")).toString().toLatin1();
+
+//    if (parameters.contains(QStringLiteral("Ors.places.host")))
+//        m_urlPrefix = parameters.value(QStringLiteral("Ors.places.host")).toString();
+//    else
+        m_urlPrefix = QStringLiteral("https://maps.googleapis.com/maps/api/place");
 
     *error = QGeoServiceProvider::NoError;
     errorString->clear();
@@ -153,6 +184,56 @@ QPlaceSearchReply *QPlaceManagerEngineGooglemaps::search(const QPlaceSearchReque
     QNetworkReply *networkReply = m_networkManager->get(QNetworkRequest(requestUrl));
 
     QPlaceSearchReplyGooglemaps *reply = new QPlaceSearchReplyGooglemaps(request, networkReply, this);
+    connect(reply, SIGNAL(finished()), this, SLOT(replyFinished()));
+    connect(reply, SIGNAL(error(QPlaceReply::Error,QString)),
+            this, SLOT(replyError(QPlaceReply::Error,QString)));
+
+    return reply;
+}
+
+QPlaceSearchSuggestionReply *QPlaceManagerEngineGooglemaps::searchSuggestions(const QPlaceSearchRequest &query)
+{
+    bool unsupported = false;
+
+    unsupported |= query.visibilityScope() != QLocation::UnspecifiedVisibility &&
+                   query.visibilityScope() != QLocation::PublicVisibility;
+
+    unsupported |= !query.categories().isEmpty();
+    unsupported |= !query.recommendationId().isEmpty();
+
+    if (unsupported) {
+        QPlaceSearchSuggestionReplyImpl *reply = new QPlaceSearchSuggestionReplyImpl(0, this);
+        connect(reply, SIGNAL(finished()), this, SLOT(replyFinished()));
+        connect(reply, SIGNAL(error(QPlaceReply::Error,QString)),
+                this, SLOT(replyError(QPlaceReply::Error,QString)));
+        QMetaObject::invokeMethod(reply, "setError", Qt::QueuedConnection,
+                                  Q_ARG(QPlaceReply::Error, QPlaceReply::BadArgumentError),
+                                  Q_ARG(QString, "Unsupported search request options specified."));
+        return reply;
+    }
+
+    QUrl requestUrl(m_urlPrefix + QStringLiteral("/autocomplete/json"));
+
+    QUrlQuery queryItems;
+
+    queryItems.addQueryItem(QStringLiteral("input"), query.searchTerm());
+
+    if (!addAtForBoundingArea(query.searchArea(), &queryItems)) {
+        QPlaceSearchSuggestionReplyImpl *reply = new QPlaceSearchSuggestionReplyImpl(0, this);
+        connect(reply, SIGNAL(finished()), this, SLOT(replyFinished()));
+        connect(reply, SIGNAL(error(QPlaceReply::Error,QString)),
+                this, SLOT(replyError(QPlaceReply::Error,QString)));
+        QMetaObject::invokeMethod(reply, "setError", Qt::QueuedConnection,
+                                  Q_ARG(QPlaceReply::Error, QPlaceReply::BadArgumentError),
+                                  Q_ARG(QString, "Invalid search area provided"));
+        return reply;
+    }
+
+    requestUrl.setQuery(queryItems);
+
+    QNetworkReply *networkReply = sendRequest(requestUrl);
+
+    QPlaceSearchSuggestionReplyImpl *reply = new QPlaceSearchSuggestionReplyImpl(networkReply, this);
     connect(reply, SIGNAL(finished()), this, SLOT(replyFinished()));
     connect(reply, SIGNAL(error(QPlaceReply::Error,QString)),
             this, SLOT(replyError(QPlaceReply::Error,QString)));
@@ -323,4 +404,22 @@ void QPlaceManagerEngineGooglemaps::fetchNextCategoryLocale()
     connect(m_categoriesReply, SIGNAL(finished()), this, SLOT(categoryReplyFinished()));
     connect(m_categoriesReply, SIGNAL(error(QNetworkReply::NetworkError)),
             this, SLOT(categoryReplyError()));
+}
+
+
+QNetworkReply *QPlaceManagerEngineGooglemaps::sendRequest(const QUrl &url)
+{
+    QUrlQuery queryItems(url);
+    queryItems.addQueryItem(QStringLiteral("key"), m_apiKey);
+
+    QUrl requestUrl = url;
+    requestUrl.setQuery(queryItems);
+
+    QNetworkRequest request;
+    request.setUrl(requestUrl);
+
+    request.setRawHeader("Accept", "application/json");
+//    request.setRawHeader("Accept-Language", createLanguageString());
+
+    return m_networkManager->get(request);
 }

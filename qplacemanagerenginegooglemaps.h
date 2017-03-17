@@ -18,6 +18,7 @@ public:
     ~QPlaceManagerEngineGooglemaps();
 
     QPlaceSearchReply *search(const QPlaceSearchRequest &request) Q_DECL_OVERRIDE;
+    QPlaceSearchSuggestionReply *searchSuggestions(const QPlaceSearchRequest &request) Q_DECL_OVERRIDE;
 
     QPlaceReply *initializeCategories() Q_DECL_OVERRIDE;
     QString parentCategoryId(const QString &categoryId) const Q_DECL_OVERRIDE;
@@ -28,6 +29,9 @@ public:
 
     QList<QLocale> locales() const Q_DECL_OVERRIDE;
     void setLocales(const QList<QLocale> &locales) Q_DECL_OVERRIDE;
+
+private:
+    QNetworkReply *sendRequest(const QUrl &url);
 
 private slots:
     void categoryReplyFinished();
@@ -42,6 +46,7 @@ private:
     QByteArray m_userAgent;
     QString m_urlPrefix;
     QList<QLocale> m_locales;
+    QString m_apiKey;
 
     QNetworkReply *m_categoriesReply;
     QList<QPlaceCategoriesReplyGooglemaps *> m_pendingCategoriesReply;
