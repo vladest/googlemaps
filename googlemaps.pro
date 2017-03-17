@@ -17,7 +17,9 @@ HEADERS += \
     qgeomapreplygooglemaps.h \
     qgeotiledmapgooglemaps.h \
     qgeotiledmappingmanagerenginegooglemaps.h \
-    qgeotilefetchergooglemaps.h
+    qgeotilefetchergooglemaps.h \
+    qplacesearchsuggestionreplyimpl.h \
+    qgeoerror_messages.h
 
 SOURCES += \
     qgeoserviceproviderplugingooglemaps.cpp \
@@ -31,7 +33,9 @@ SOURCES += \
     qgeomapreplygooglemaps.cpp \
     qgeotiledmapgooglemaps.cpp \
     qgeotiledmappingmanagerenginegooglemaps.cpp \
-    qgeotilefetchergooglemaps.cpp
+    qgeotilefetchergooglemaps.cpp \
+    qplacesearchsuggestionreplyimpl.cpp \
+    qgeoerror_messages.cpp
 
 
 OTHER_FILES += \

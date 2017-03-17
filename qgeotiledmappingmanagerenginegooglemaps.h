@@ -32,9 +32,9 @@ public:
 
 private:
     void initialize();
-    void populateMapSchemes();
+//    void populateMapSchemes();
 
-    QHash<int, QString> m_mapSchemes;
+//    QHash<int, QString> m_mapSchemes;
     QString m_cacheDirectory;
 };
 

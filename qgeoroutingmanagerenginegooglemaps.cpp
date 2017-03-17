@@ -16,7 +16,10 @@ QGeoRoutingManagerEngineGooglemaps::QGeoRoutingManagerEngineGooglemaps(const QVa
         m_userAgent = "Qt Location based application";
 
     m_urlPrefix = QStringLiteral("https://maps.googleapis.com/maps/api/directions/json");
-    m_apiKey = parameters.value(QStringLiteral("googlemaps.route.apikey")).toString();
+    if(parameters.contains(QStringLiteral("googlemaps.route.apikey")))
+        m_apiKey = parameters.value(QStringLiteral("googlemaps.route.apikey")).toString();
+    else
+        m_apiKey = parameters.value(QStringLiteral("googlemaps.apikey")).toString();
 
     *error = QGeoServiceProvider::NoError;
     errorString->clear();

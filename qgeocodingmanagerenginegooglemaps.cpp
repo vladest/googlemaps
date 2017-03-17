@@ -37,7 +37,10 @@ QGeoCodingManagerEngineGooglemaps::QGeoCodingManagerEngineGooglemaps(const QVari
     else
         m_userAgent = "Qt Location based application";
 
-    m_apiKey = parameters.value(QStringLiteral("googlemaps.geocode.apikey")).toString();
+    if(parameters.contains((QStringLiteral("googlemaps.geocode.apikey"))))
+        m_apiKey = parameters.value(QStringLiteral("googlemaps.geocode.apikey")).toString();
+    else
+        m_apiKey = parameters.value(QStringLiteral("googlemaps.apikey")).toString();
 
     m_urlPrefix = QStringLiteral("https://maps.googleapis.com/maps/api/geocode/json");
 

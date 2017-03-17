@@ -30,6 +30,7 @@ private:
     QString _getURL(int type, int x, int y, int zoom);
     void _tryCorrectGoogleVersions(QNetworkAccessManager *networkManager);
     void _getSecGoogleWords(int x, int y, QString &sec1, QString &sec2);
+    void _getSessionToken();
 
 private slots:
     void _networkReplyError(QNetworkReply::NetworkError error);
@@ -54,6 +55,7 @@ private:
     QMutex          _googleVersionMutex;
     QByteArray      _userAgent;
     QString         _language;
+    QJsonValue      _sessionToken;
 
     // Google version strings
     QString         _versionGoogleMap;
