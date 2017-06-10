@@ -35,10 +35,17 @@ QGeoTiledMappingManagerEngineGooglemaps::QGeoTiledMappingManagerEngineGooglemaps
     setTileSize(QSize(tile, tile));
 
     QList<QGeoMapType> types;
+#if QT_VERSION < QT_VERSION_CHECK(5,9,0)
     types << QGeoMapType(QGeoMapType::StreetMap, tr("Road Map"), tr("Normal map view in daylight mode"), false, false, 1);
     types << QGeoMapType(QGeoMapType::SatelliteMapDay, tr("Satellite"), tr("Satellite map view in daylight mode"), false, false, 2);
     types << QGeoMapType(QGeoMapType::TerrainMap, tr("Terrain"), tr("Terrain map view in daylight mode"), false, false, 3);
     types << QGeoMapType(QGeoMapType::HybridMap, tr("Hybrid"), tr("Satellite map view with streets in daylight mode"), false, false, 4);
+#else
+    types << QGeoMapType(QGeoMapType::StreetMap, tr("Road Map"), tr("Normal map view in daylight mode"), false, false, 1, "googlemaps");
+    types << QGeoMapType(QGeoMapType::SatelliteMapDay, tr("Satellite"), tr("Satellite map view in daylight mode"), false, false, 2, "googlemaps");
+    types << QGeoMapType(QGeoMapType::TerrainMap, tr("Terrain"), tr("Terrain map view in daylight mode"), false, false, 3, "googlemaps");
+    types << QGeoMapType(QGeoMapType::HybridMap, tr("Hybrid"), tr("Satellite map view with streets in daylight mode"), false, false, 4, "googlemaps");
+#endif
     setSupportedMapTypes(types);
 
     QGeoTileFetcherGooglemaps *fetcher = new QGeoTileFetcherGooglemaps(parameters, this, tileSize());
@@ -53,28 +60,13 @@ QGeoTiledMappingManagerEngineGooglemaps::QGeoTiledMappingManagerEngineGooglemaps
     tileCache->setMaxDiskUsage(100 * 1024 * 1024);
     setTileCache(tileCache);
 
-//    populateMapSchemes();
-//    *error = QGeoServiceProvider::NoError;
-//    errorString->clear();
+    *error = QGeoServiceProvider::NoError;
+    errorString->clear();
 }
 
 QGeoTiledMappingManagerEngineGooglemaps::~QGeoTiledMappingManagerEngineGooglemaps()
 {
 }
-
-//void QGeoTiledMappingManagerEngineGooglemaps::populateMapSchemes()
-//{
-//    m_mapSchemes[0] = QStringLiteral("roadmap");
-//    m_mapSchemes[1] = QStringLiteral("roadmap");
-//    m_mapSchemes[2] = QStringLiteral("satellite");
-//    m_mapSchemes[3] = QStringLiteral("terrain");
-//    m_mapSchemes[4] = QStringLiteral("hybrid");
-//}
-
-//QString QGeoTiledMappingManagerEngineGooglemaps::getScheme(int mapId)
-//{
-//    return m_mapSchemes[mapId];
-//}
 
 QGeoMap *QGeoTiledMappingManagerEngineGooglemaps::createMap()
 {
