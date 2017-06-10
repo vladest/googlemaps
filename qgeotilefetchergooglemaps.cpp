@@ -12,6 +12,7 @@
 #include <QTime>
 #include <QNetworkProxy>
 #include <QtCore/QJsonDocument>
+#include <QSslSocket>
 
 #include <math.h>
 
@@ -231,9 +232,11 @@ void QGeoTileFetcherGooglemaps::_tryCorrectGoogleVersions(QNetworkAccessManager*
         QNetworkProxy tProxy;
         tProxy.setType(QNetworkProxy::DefaultProxy);
         networkManager->setProxy(tProxy);
-        QSslConfiguration conf = qheader.sslConfiguration();        conf.setPeerVerifyMode(QSslSocket::VerifyNone);
+#ifndef QT_NO_SSL
+        QSslConfiguration conf = qheader.sslConfiguration();
+        conf.setPeerVerifyMode(QSslSocket::VerifyNone);
         qheader.setSslConfiguration(conf);
-
+#endif
         QString url = "http://maps.google.com/maps/api/js?v=3.2&sensor=false";
         qheader.setUrl(QUrl(url));
         qheader.setRawHeader("User-Agent", _userAgent);

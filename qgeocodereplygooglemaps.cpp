@@ -9,6 +9,7 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
+#include "QDebug"
 
 static QGeoCoordinate constructCoordiante(const QJsonObject &jsonCoord) {
     QGeoCoordinate coord(0,0);
