@@ -49,19 +49,13 @@ private:
     QString m_client;
     QString m_baseUri;
 
-    int             _timeout;
     bool            _googleVersionRetrieved;
     QNetworkReply*  _googleReply;
     QMutex          _googleVersionMutex;
     QByteArray      _userAgent;
     QString         _language;
-    QJsonValue      _sessionToken;
 
     // Google version strings
-    QString         _versionGoogleMap;
-    QString         _versionGoogleSatellite;
-    QString         _versionGoogleLabels;
-    QString         _versionGoogleTerrain;
     QString         _secGoogleWord;
 
     QNetworkRequest netRequest;

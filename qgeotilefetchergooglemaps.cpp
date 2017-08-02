@@ -50,32 +50,13 @@ QGeoTileFetcherGooglemaps::QGeoTileFetcherGooglemaps(const QVariantMap &paramete
         _userAgent = parameters.value(QStringLiteral("googlemaps.useragent")).toString().toLatin1();
     else
         _userAgent = "";
-//        _userAgent = "Mozilla/5.0 (X11; Linux i586; rv:31.0) Gecko/20100101 Firefox/31.0";
-
     QStringList langs = QLocale::system().uiLanguages();
     if (langs.length() > 0) {
         _language = langs[0];
     }
 
     // Google version strings
-    _versionGoogleMap            = "m@338000000";
-    _versionGoogleSatellite      = "198";
-    _versionGoogleLabels         = "h@336";
-    _versionGoogleTerrain        = "t@132,r@338000000";
     _secGoogleWord               = "Galileo";
-
-//    _tryCorrectGoogleVersions(m_networkManager);
-
-//    netRequest.setRawHeader("Referrer", "https://www.google.com/maps/preview");
-//    netRequest.setRawHeader("Accept", "*/*");
-//    netRequest.setRawHeader("User-Agent", _userAgent);
-
-    /*  2017: support new Google Maps Tile API (yet under development)
-        You have to be whitelisted to use the Tile API. I can't tell how to get whitelisted.
-        see https://developers.google.com/maps/documentation/tile/
-        To use the new feature getUrl() and parsing the response has to be adapted. Maybe more than that...
-    */
-//    _getSessionToken();
 }
 
 QGeoTileFetcherGooglemaps::~QGeoTileFetcherGooglemaps()
@@ -195,24 +176,6 @@ void QGeoTileFetcherGooglemaps::_googleVersionCompleted()
         qDebug() << "Error collecting Google maps version info";
         return;
     }
-    QString html = QString(_googleReply->readAll());
-
-    QRegExp reg("\"*https?://mt\\D?\\d..*/vt\\?lyrs=m@(\\d*)", Qt::CaseInsensitive);
-    if (reg.indexIn(html) != -1) {
-        QStringList gc = reg.capturedTexts();
-        _versionGoogleMap = QString("m@%1").arg(gc[1]);
-    }
-    reg = QRegExp("\"*https?://khm\\D?\\d.googleapis.com/kh\\?v=(\\d*)", Qt::CaseInsensitive);
-    if (reg.indexIn(html) != -1) {
-        QStringList gc = reg.capturedTexts();
-        _versionGoogleSatellite = gc[1];
-    }
-    reg = QRegExp("\"*https?://mt\\D?\\d..*/vt\\?lyrs=t@(\\d*),r@(\\d*)", Qt::CaseInsensitive);
-    if (reg.indexIn(html) != -1) {
-        QStringList gc = reg.capturedTexts();
-        _versionGoogleTerrain = QString("t@%1,r@%2").arg(gc[1]).arg(gc[2]);
-    }
-
     _googleReply->deleteLater();
     _googleReply = NULL;
 }
