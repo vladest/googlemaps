@@ -20,16 +20,6 @@
 
 QT_BEGIN_NAMESPACE
 
-namespace
-{
-
-    int _getServerNum(int x, int y, int max)
-    {
-        return (x + 2 * y) % max;
-    }
-
-}
-
 QGeoTileFetcherGooglemaps::QGeoTileFetcherGooglemaps(const QVariantMap &parameters,
                                            QGeoTiledMappingManagerEngineGooglemaps *engine,
                                            const QSize &tileSize)
