@@ -77,7 +77,7 @@ void QGeoTileFetcherGooglemaps::_getSessionToken()
 
     QJsonObject object = document.object();
     QJsonValue status = object.value(QStringLiteral("session"));
-    printf(status.toString().toLatin1().data());
+    printf("%s", status.toString().toLatin1().data());
 }
 
 QGeoTiledMapReply *QGeoTileFetcherGooglemaps::getTileImage(const QGeoTileSpec &spec)
