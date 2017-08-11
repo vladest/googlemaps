@@ -114,7 +114,7 @@ QString QGeoTileFetcherGooglemaps::_getURL(int type, int x, int y, int zoom)
         QString sec1    = ""; // after &x=...
         QString sec2    = ""; // after &zoom=...
         _getSecGoogleWords(x, y, sec1, sec2);
-        return QString("http://mt.google.com/vt/lyrs=m&x=%1%2&y=%3&z=%4&s=%5").arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2);
+        return QString("http://mt.google.com/vt/lyrs=m&hl=%1&x=%2%3&y=%4&z=%5&s=%6").arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2);
     }
     break;
     case 2: //Satallite Map
