@@ -40,9 +40,13 @@ QGeoTileFetcherGooglemaps::QGeoTileFetcherGooglemaps(const QVariantMap &paramete
         _userAgent = parameters.value(QStringLiteral("googlemaps.useragent")).toString().toLatin1();
     else
         _userAgent = "";
-    QStringList langs = QLocale::system().uiLanguages();
-    if (langs.length() > 0) {
-        _language = langs[0];
+    if (parameters.contains(QStringLiteral("googlemaps.maps.language"))) {
+        _language = parameters.value(QStringLiteral("googlemaps.maps.language")).toString().toLatin1();
+        if (_language.isEmpty())
+           _language = "en-US";
+    } else {
+        QStringList langs = QLocale::system().uiLanguages();
+        _language = (langs.length() > 0) ? langs[0] : "en-US";
     }
 
     // Google version strings
