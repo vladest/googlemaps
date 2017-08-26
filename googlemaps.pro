@@ -1,5 +1,5 @@
 TARGET = qtgeoservices_googlemaps
-QT += location-private network
+QT += location-private positioning-private network
 
 PLUGIN_TYPE = geoservices
 PLUGIN_CLASS_NAME = QGeoServiceProviderFactoryGooglemaps
