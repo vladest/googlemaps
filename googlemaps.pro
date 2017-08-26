@@ -1,5 +1,17 @@
 TARGET = qtgeoservices_googlemaps
-QT += location-private positioning-private network
+
+qtHaveModule(location-private) {
+	QT += location-private
+} else {
+	QT += location
+}
+qtHaveModule(positioning-private) {
+	QT += positioning-private
+} else {
+	QT += positioning
+}
+QT += network
+INCLUDEPATH += ../ ./
 
 PLUGIN_TYPE = geoservices
 PLUGIN_CLASS_NAME = QGeoServiceProviderFactoryGooglemaps
