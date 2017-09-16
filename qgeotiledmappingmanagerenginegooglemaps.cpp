@@ -3,7 +3,12 @@
 #include "qgeotiledmapgooglemaps.h"
 #include "qgeotilefetchergooglemaps.h"
 #include "QtLocation/private/qgeotilespec_p.h"
+#if QT_VERSION < QT_VERSION_CHECK(5,6,0)
+#include <QStandardPaths>
+#include "QtLocation/private/qgeotilecache_p.h"
+#else
 #include "QtLocation/private/qgeofiletilecache_p.h"
+#endif
 
 #include <QDebug>
 #include <QDir>
@@ -53,12 +58,21 @@ QGeoTiledMappingManagerEngineGooglemaps::QGeoTiledMappingManagerEngineGooglemaps
 
     if (parameters.contains(QStringLiteral("googlemaps.cachefolder")))
         m_cacheDirectory = parameters.value(QStringLiteral("googlemaps.cachefolder")).toString().toLatin1();
-    else
-        m_cacheDirectory = QAbstractGeoTileCache::baseCacheDirectory() + QLatin1String("googlemaps");
 
+    const int szCache = 100 * 1024 * 1024;
+#if QT_VERSION < QT_VERSION_CHECK(5,6,0)
+    if (m_cacheDirectory.isEmpty())
+        m_cacheDirectory = QStandardPaths::writableLocation(QStandardPaths::GenericCacheLocation) + QLatin1String("googlemaps");
+    QGeoTileCache *tileCache = createTileCacheWithDir(m_cacheDirectory);
+    if (tileCache)
+        tileCache->setMaxDiskUsage(szCache);
+#else
+    if (m_cacheDirectory.isEmpty())
+        m_cacheDirectory = QAbstractGeoTileCache::baseCacheDirectory() + QLatin1String("googlemaps");
     QAbstractGeoTileCache *tileCache = new QGeoFileTileCache(m_cacheDirectory);
-    tileCache->setMaxDiskUsage(100 * 1024 * 1024);
+    tileCache->setMaxDiskUsage(szCache);
     setTileCache(tileCache);
+#endif
 
     *error = QGeoServiceProvider::NoError;
     errorString->clear();
