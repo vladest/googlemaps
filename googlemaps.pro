@@ -1,4 +1,13 @@
+TEMPLATE = lib
+CONFIG += plugin
+CONFIG += relative_qt_rpath  # Qt's plugins should be relocatable
 TARGET = qtgeoservices_googlemaps
+PLUGIN_TYPE = geoservices
+PLUGIN_CLASS_NAME = QGeoServiceProviderFactoryGooglemaps
+target.path = $$[QT_INSTALL_PLUGINS]/$$PLUGIN_TYPE
+INSTALLS += target
+TARGET = $$qt5LibraryTarget($$TARGET)
+
 
 qtHaveModule(location-private) {
 	QT += location-private
@@ -12,10 +21,6 @@ qtHaveModule(positioning-private) {
 }
 QT += network
 INCLUDEPATH += ../ ./
-
-PLUGIN_TYPE = geoservices
-PLUGIN_CLASS_NAME = QGeoServiceProviderFactoryGooglemaps
-load(qt_plugin)
 
 HEADERS += \
     qgeoserviceproviderplugingooglemaps.h \
