@@ -62,7 +62,7 @@ QGeoTiledMappingManagerEngineGooglemaps::QGeoTiledMappingManagerEngineGooglemaps
     setTileFetcher(fetcher);
 
     if (parameters.contains(QStringLiteral("googlemaps.cachefolder")))
-        m_cacheDirectory = parameters.value(QStringLiteral("googlemaps.cachefolder")).toString().toLatin1();
+        m_cacheDirectory = parameters.value(QStringLiteral("googlemaps.cachefolder")).toString();
 
     const int szCache = 100 * 1024 * 1024;
 #if QT_VERSION < QT_VERSION_CHECK(5,6,0)
