@@ -27,7 +27,8 @@ QGeoTileFetcherGooglemaps::QGeoTileFetcherGooglemaps(const QVariantMap &paramete
   m_networkManager(new QNetworkAccessManager(this)),
   m_engineGooglemaps(engine),
   m_tileSize(tileSize),
-  _googleVersionRetrieved(false)
+  _googleVersionRetrieved(false),
+  _scale(1)
 {
     if(parameters.contains(QStringLiteral("googlemaps.maps.apikey")))
         m_apiKey = parameters.value(QStringLiteral("googlemaps.maps.apikey")).toString();
@@ -48,6 +49,9 @@ QGeoTileFetcherGooglemaps::QGeoTileFetcherGooglemaps(const QVariantMap &paramete
         QStringList langs = QLocale::system().uiLanguages();
         _language = (langs.length() > 0) ? langs[0] : "en-US";
     }
+
+    if (parameters.contains(QStringLiteral("googlemaps.maps.highdpi")))
+        _scale = (parameters.value(QStringLiteral("googlemaps.maps.highdpi")).toBool()) ? 2 : 1;
 
     // Google version strings
     _secGoogleWord               = "Galileo";
@@ -118,7 +122,7 @@ QString QGeoTileFetcherGooglemaps::_getURL(int type, int x, int y, int zoom)
         QString sec1    = ""; // after &x=...
         QString sec2    = ""; // after &zoom=...
         _getSecGoogleWords(x, y, sec1, sec2);
-        return QString("http://mt.google.com/vt/lyrs=m&hl=%1&x=%2%3&y=%4&z=%5&s=%6").arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2);
+        return QString("http://mt.google.com/vt/lyrs=m&hl=%1&x=%2%3&y=%4&z=%5&s=%6&scale=%7").arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2).arg(_scale);
     }
     break;
     case 2: //Satallite Map
@@ -126,7 +130,7 @@ QString QGeoTileFetcherGooglemaps::_getURL(int type, int x, int y, int zoom)
         QString sec1    = ""; // after &x=...
         QString sec2    = ""; // after &zoom=...
         _getSecGoogleWords(x, y, sec1, sec2);
-        return QString("http://mt.google.com/vt/lyrs=s&hl=%1&x=%2%3&y=%4&z=%5&s=%6").arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2);
+        return QString("http://mt.google.com/vt/lyrs=s&hl=%1&x=%2%3&y=%4&z=%5&s=%6&scale=%7").arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2).arg(_scale);
     }
     break;
     case 3: //Terrain Map
@@ -134,7 +138,7 @@ QString QGeoTileFetcherGooglemaps::_getURL(int type, int x, int y, int zoom)
         QString sec1    = ""; // after &x=...
         QString sec2    = ""; // after &zoom=...
         _getSecGoogleWords(x, y, sec1, sec2);
-        return QString("http://mt.google.com/vt/lyrs=p&hl=%1&x=%2%3&y=%4&z=%5&s=%6").arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2);
+        return QString("http://mt.google.com/vt/lyrs=p&hl=%1&x=%2%3&y=%4&z=%5&s=%6&scale=%7").arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2).arg(_scale);
     }
     break;
     case 4: //Hybrid Map
@@ -142,7 +146,7 @@ QString QGeoTileFetcherGooglemaps::_getURL(int type, int x, int y, int zoom)
         QString sec1    = ""; // after &x=...
         QString sec2    = ""; // after &zoom=...
         _getSecGoogleWords(x, y, sec1, sec2);
-        return QString("http://mt.google.com/vt/lyrs=y&hl=%1&x=%2%3&y=%4&z=%5&s=%6").arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2);
+        return QString("http://mt.google.com/vt/lyrs=y&hl=%1&x=%2%3&y=%4&z=%5&s=%6&scale=%7").arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2).arg(_scale);
     }
     break;
     }
