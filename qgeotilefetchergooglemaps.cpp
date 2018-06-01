@@ -134,7 +134,7 @@ QString QGeoTileFetcherGooglemaps::_getURL(int type, int x, int y, int zoom)
         QString sec1    = ""; // after &x=...
         QString sec2    = ""; // after &zoom=...
         _getSecGoogleWords(x, y, sec1, sec2);
-        return QString("http://mt.google.com/vt/lyrs=p&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2);
+        return QString("http://mt.google.com/vt/lyrs=p&hl=%1&x=%2%3&y=%4&z=%5&s=%6").arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2);
     }
     break;
     case 4: //Hybrid Map
@@ -142,7 +142,7 @@ QString QGeoTileFetcherGooglemaps::_getURL(int type, int x, int y, int zoom)
         QString sec1    = ""; // after &x=...
         QString sec2    = ""; // after &zoom=...
         _getSecGoogleWords(x, y, sec1, sec2);
-        return QString("http://mt.google.com/vt/lyrs=y&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2);
+        return QString("http://mt.google.com/vt/lyrs=y&hl=%1&x=%2%3&y=%4&z=%5&s=%6").arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2);
     }
     break;
     }
