@@ -54,6 +54,7 @@ private:
     QMutex          _googleVersionMutex;
     QByteArray      _userAgent;
     QString         _language;
+    int             _scale;
 
     // Google version strings
     QString         _secGoogleWord;
