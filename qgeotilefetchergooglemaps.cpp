@@ -36,7 +36,7 @@ QGeoTileFetcherGooglemaps::QGeoTileFetcherGooglemaps(const QVariantMap &paramete
         m_apiKey = parameters.value(QStringLiteral("googlemaps.apikey")).toString();
     m_signature = parameters.value(QStringLiteral("googlemaps.maps.signature")).toString();
     m_client = parameters.value(QStringLiteral("googlemaps.maps.client")).toString();
-    m_baseUri = QStringLiteral("http://maps.googleapis.com/maps/api/staticmap");
+    m_baseUri = QStringLiteral("https://maps.googleapis.com/maps/api/staticmap");
     if (parameters.contains(QStringLiteral("googlemaps.useragent")))
         _userAgent = parameters.value(QStringLiteral("googlemaps.useragent")).toString().toLatin1();
     else
@@ -122,7 +122,7 @@ QString QGeoTileFetcherGooglemaps::_getURL(int type, int x, int y, int zoom)
         QString sec1    = ""; // after &x=...
         QString sec2    = ""; // after &zoom=...
         _getSecGoogleWords(x, y, sec1, sec2);
-        return QString("http://mt.google.com/vt/lyrs=m&hl=%1&x=%2%3&y=%4&z=%5&s=%6&scale=%7").arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2).arg(_scale);
+        return QString("https://mt.google.com/vt/lyrs=m&hl=%1&x=%2%3&y=%4&z=%5&s=%6&scale=%7").arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2).arg(_scale);
     }
     break;
     case 2: //Satallite Map
@@ -130,7 +130,7 @@ QString QGeoTileFetcherGooglemaps::_getURL(int type, int x, int y, int zoom)
         QString sec1    = ""; // after &x=...
         QString sec2    = ""; // after &zoom=...
         _getSecGoogleWords(x, y, sec1, sec2);
-        return QString("http://mt.google.com/vt/lyrs=s&hl=%1&x=%2%3&y=%4&z=%5&s=%6&scale=%7").arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2).arg(_scale);
+        return QString("https://mt.google.com/vt/lyrs=s&hl=%1&x=%2%3&y=%4&z=%5&s=%6&scale=%7").arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2).arg(_scale);
     }
     break;
     case 3: //Terrain Map
@@ -138,7 +138,7 @@ QString QGeoTileFetcherGooglemaps::_getURL(int type, int x, int y, int zoom)
         QString sec1    = ""; // after &x=...
         QString sec2    = ""; // after &zoom=...
         _getSecGoogleWords(x, y, sec1, sec2);
-        return QString("http://mt.google.com/vt/lyrs=p&hl=%1&x=%2%3&y=%4&z=%5&s=%6&scale=%7").arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2).arg(_scale);
+        return QString("https://mt.google.com/vt/lyrs=p&hl=%1&x=%2%3&y=%4&z=%5&s=%6&scale=%7").arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2).arg(_scale);
     }
     break;
     case 4: //Hybrid Map
@@ -146,7 +146,7 @@ QString QGeoTileFetcherGooglemaps::_getURL(int type, int x, int y, int zoom)
         QString sec1    = ""; // after &x=...
         QString sec2    = ""; // after &zoom=...
         _getSecGoogleWords(x, y, sec1, sec2);
-        return QString("http://mt.google.com/vt/lyrs=y&hl=%1&x=%2%3&y=%4&z=%5&s=%6&scale=%7").arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2).arg(_scale);
+        return QString("https://mt.google.com/vt/lyrs=y&hl=%1&x=%2%3&y=%4&z=%5&s=%6&scale=%7").arg(_language).arg(x).arg(sec1).arg(y).arg(zoom).arg(sec2).arg(_scale);
     }
     break;
     }
@@ -198,7 +198,7 @@ void QGeoTileFetcherGooglemaps::_tryCorrectGoogleVersions(QNetworkAccessManager*
         conf.setPeerVerifyMode(QSslSocket::VerifyNone);
         qheader.setSslConfiguration(conf);
 #endif
-        QString url = "http://maps.google.com/maps/api/js?v=3.2&sensor=false";
+        QString url = "https://maps.google.com/maps/api/js?v=3.2&sensor=false";
         qheader.setUrl(QUrl(url));
         qheader.setRawHeader("User-Agent", _userAgent);
         _googleReply = networkManager->get(qheader);

@@ -16,7 +16,7 @@
 
 namespace
 {
-QString SpecialPhrasesBaseUrl = QStringLiteral("http://wiki.openstreetmap.org/wiki/Special:Export/Nominatim/Special_Phrases/");
+QString SpecialPhrasesBaseUrl = QStringLiteral("https://wiki.openstreetmap.org/wiki/Special:Export/Nominatim/Special_Phrases/");
 
 QString nameForTagKey(const QString &tagKey)
 {
