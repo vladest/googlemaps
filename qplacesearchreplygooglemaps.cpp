@@ -7,8 +7,12 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtPositioning/QGeoCircle>
 #include <QtPositioning/QGeoRectangle>
+#include <QtPositioning/QGeoLocation>
+#include <QtPositioning/QGeoAddress>
 #include <QtLocation/QPlaceResult>
 #include <QtLocation/QPlaceSearchRequest>
+#include <QtLocation/QPlace>
+#include <QtLocation/QPlaceIcon>
 
 QPlaceSearchReplyGooglemaps::QPlaceSearchReplyGooglemaps(const QPlaceSearchRequest &request,
                                              QNetworkReply *reply, QPlaceManagerEngineGooglemaps *parent)
@@ -38,7 +42,7 @@ void QPlaceSearchReplyGooglemaps::abort()
 void QPlaceSearchReplyGooglemaps::setError(QPlaceReply::Error errorCode, const QString &errorString)
 {
     QPlaceReply::setError(errorCode, errorString);
-    emit error(errorCode, errorString);
+    emit errorOccurred(errorCode, errorString);
     setFinished(true);
     emit finished();
 }
@@ -163,7 +167,7 @@ QPlaceResult QPlaceSearchReplyGooglemaps::parsePlaceResult(const QJsonObject &it
     QGeoLocation location;
     location.setCoordinate(coordinate);
     location.setAddress(address);
-    location.setBoundingBox(parseBoundingBox(item.value(QStringLiteral("boundingbox")).toArray()));
+    location.setBoundingShape(parseBoundingBox(item.value(QStringLiteral("boundingbox")).toArray()));
 
     place.setLocation(location);
 

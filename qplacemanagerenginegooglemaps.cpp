@@ -1,6 +1,7 @@
 #include "qplacemanagerenginegooglemaps.h"
 #include "qplacesearchreplygooglemaps.h"
 #include "qplacecategoriesreplygooglemaps.h"
+#include "qplacesearchrequest.h"
 #include "qplacesearchsuggestionreplyimpl.h"
 
 #include <QtCore/QUrlQuery>
@@ -10,6 +11,8 @@
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
 #include <QtPositioning/QGeoCircle>
+#include <QLocation>
+#include <QPlaceCategory>
 #include <QtLocation/private/unsupportedreplies_p.h>
 
 #include <QtCore/QElapsedTimer>
@@ -322,11 +325,11 @@ void QPlaceManagerEngineGooglemaps::categoryReplyFinished()
             QRegularExpressionMatchIterator i = regex.globalMatch(page);
             while (i.hasNext()) {
                 QRegularExpressionMatch match = i.next();
-                QString name = match.capturedRef(1).toString();
-                QString tagKey = match.capturedRef(2).toString();
-                QString tagValue = match.capturedRef(3).toString();
-                QString op = match.capturedRef(4).toString();
-                QString plural = match.capturedRef(5).toString();
+                QString name = match.captured(1);
+                QString tagKey = match.captured(2);
+                QString tagValue = match.captured(3);
+                QString op = match.captured(4);
+                QString plural = match.captured(5);
 
                 // Only interested in any operator plural forms
                 if (op != QLatin1String("-") || plural != QLatin1String("Y"))
@@ -385,7 +388,7 @@ void QPlaceManagerEngineGooglemaps::replyError(QPlaceReply::Error errorCode, con
 {
     QPlaceReply *reply = qobject_cast<QPlaceReply *>(sender());
     if (reply)
-        emit error(reply, errorCode, errorString);
+        emit errorOccurred(reply, errorCode, errorString);
 }
 
 void QPlaceManagerEngineGooglemaps::fetchNextCategoryLocale()

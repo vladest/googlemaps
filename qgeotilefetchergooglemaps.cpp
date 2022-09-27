@@ -204,8 +204,7 @@ void QGeoTileFetcherGooglemaps::_tryCorrectGoogleVersions(QNetworkAccessManager*
         _googleReply = networkManager->get(qheader);
         connect(_googleReply, &QNetworkReply::finished, this, &QGeoTileFetcherGooglemaps::_googleVersionCompleted);
         connect(_googleReply, &QNetworkReply::destroyed, this, &QGeoTileFetcherGooglemaps::_replyDestroyed);
-        connect(_googleReply, static_cast<void (QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error),
-                this, &QGeoTileFetcherGooglemaps::_networkReplyError);
+        connect(_googleReply, &QNetworkReply::errorOccurred, this, &QGeoTileFetcherGooglemaps::_networkReplyError);
         networkManager->setProxy(proxy);
     }
 }

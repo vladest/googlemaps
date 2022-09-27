@@ -128,5 +128,5 @@ void QGeoCodingManagerEngineGooglemaps::replyError(QGeoCodeReply::Error errorCod
 {
     QGeoCodeReply *reply = qobject_cast<QGeoCodeReply *>(sender());
     if (reply)
-        emit error(reply, errorCode, errorString);
+        emit errorOccurred(reply, errorCode, errorString);
 }
