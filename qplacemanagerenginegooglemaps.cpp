@@ -187,9 +187,8 @@ QPlaceSearchReply *QPlaceManagerEngineGooglemaps::search(const QPlaceSearchReque
     QNetworkReply *networkReply = m_networkManager->get(QNetworkRequest(requestUrl));
 
     QPlaceSearchReplyGooglemaps *reply = new QPlaceSearchReplyGooglemaps(request, networkReply, this);
-    connect(reply, SIGNAL(finished()), this, SLOT(replyFinished()));
-    connect(reply, SIGNAL(error(QPlaceReply::Error,QString)),
-            this, SLOT(replyError(QPlaceReply::Error,QString)));
+    connect(reply, &QPlaceSearchReplyGooglemaps::finished, this, &QPlaceManagerEngineGooglemaps::replyFinished);
+    connect(reply, &QPlaceSearchReplyGooglemaps::errorOccurred, this, &QPlaceManagerEngineGooglemaps::replyError);
 
     return reply;
 }
@@ -206,9 +205,8 @@ QPlaceSearchSuggestionReply *QPlaceManagerEngineGooglemaps::searchSuggestions(co
 
     if (unsupported) {
         QPlaceSearchSuggestionReplyImpl *reply = new QPlaceSearchSuggestionReplyImpl(0, this);
-        connect(reply, SIGNAL(finished()), this, SLOT(replyFinished()));
-        connect(reply, SIGNAL(error(QPlaceReply::Error,QString)),
-                this, SLOT(replyError(QPlaceReply::Error,QString)));
+        connect(reply, &QPlaceSearchSuggestionReplyImpl::finished, this, &QPlaceManagerEngineGooglemaps::replyFinished);
+        connect(reply, &QPlaceSearchSuggestionReplyImpl::errorOccurred, this, &QPlaceManagerEngineGooglemaps::replyError);
         QMetaObject::invokeMethod(reply, "setError", Qt::QueuedConnection,
                                   Q_ARG(QPlaceReply::Error, QPlaceReply::BadArgumentError),
                                   Q_ARG(QString, "Unsupported search request options specified."));
@@ -223,9 +221,8 @@ QPlaceSearchSuggestionReply *QPlaceManagerEngineGooglemaps::searchSuggestions(co
 
     if (!addAtForBoundingArea(query.searchArea(), &queryItems)) {
         QPlaceSearchSuggestionReplyImpl *reply = new QPlaceSearchSuggestionReplyImpl(0, this);
-        connect(reply, SIGNAL(finished()), this, SLOT(replyFinished()));
-        connect(reply, SIGNAL(error(QPlaceReply::Error,QString)),
-                this, SLOT(replyError(QPlaceReply::Error,QString)));
+        connect(reply, &QPlaceSearchSuggestionReplyImpl::finished, this, &QPlaceManagerEngineGooglemaps::replyFinished);
+        connect(reply, &QPlaceSearchSuggestionReplyImpl::errorOccurred, this, &QPlaceManagerEngineGooglemaps::replyError);
         QMetaObject::invokeMethod(reply, "setError", Qt::QueuedConnection,
                                   Q_ARG(QPlaceReply::Error, QPlaceReply::BadArgumentError),
                                   Q_ARG(QString, "Invalid search area provided"));
@@ -237,9 +234,8 @@ QPlaceSearchSuggestionReply *QPlaceManagerEngineGooglemaps::searchSuggestions(co
     QNetworkReply *networkReply = sendRequest(requestUrl);
 
     QPlaceSearchSuggestionReplyImpl *reply = new QPlaceSearchSuggestionReplyImpl(networkReply, this);
-    connect(reply, SIGNAL(finished()), this, SLOT(replyFinished()));
-    connect(reply, SIGNAL(error(QPlaceReply::Error,QString)),
-            this, SLOT(replyError(QPlaceReply::Error,QString)));
+    connect(reply, &QPlaceSearchSuggestionReplyImpl::finished, this, &QPlaceManagerEngineGooglemaps::replyFinished);
+    connect(reply, &QPlaceSearchSuggestionReplyImpl::errorOccurred, this, &QPlaceManagerEngineGooglemaps::replyError);
 
     return reply;
 }
@@ -254,9 +250,8 @@ QPlaceReply *QPlaceManagerEngineGooglemaps::initializeCategories()
     }
 
     QPlaceCategoriesReplyGooglemaps *reply = new QPlaceCategoriesReplyGooglemaps(this);
-    connect(reply, SIGNAL(finished()), this, SLOT(replyFinished()));
-    connect(reply, SIGNAL(error(QPlaceReply::Error,QString)),
-            this, SLOT(replyError(QPlaceReply::Error,QString)));
+    connect(reply, &QPlaceCategoriesReplyGooglemaps::finished, this, &QPlaceManagerEngineGooglemaps::replyFinished);
+    connect(reply, &QPlaceCategoriesReplyGooglemaps::errorOccurred, this, &QPlaceManagerEngineGooglemaps::replyError);
 
     // TODO delayed finished() emission
     if (!m_categories.isEmpty())
@@ -404,9 +399,8 @@ void QPlaceManagerEngineGooglemaps::fetchNextCategoryLocale()
     QUrl requestUrl = QUrl(SpecialPhrasesBaseUrl + locale.name().left(2).toUpper());
 
     m_categoriesReply = m_networkManager->get(QNetworkRequest(requestUrl));
-    connect(m_categoriesReply, SIGNAL(finished()), this, SLOT(categoryReplyFinished()));
-    connect(m_categoriesReply, SIGNAL(error(QNetworkReply::NetworkError)),
-            this, SLOT(categoryReplyError()));
+    connect(m_categoriesReply, &QNetworkReply::finished, this, &QPlaceManagerEngineGooglemaps::categoryReplyFinished);
+    connect(m_categoriesReply, &QNetworkReply::errorOccurred, this, &QPlaceManagerEngineGooglemaps::categoryReplyError);
 }
 
 

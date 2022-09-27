@@ -26,7 +26,7 @@ QPlaceSearchReplyGooglemaps::QPlaceSearchReplyGooglemaps(const QPlaceSearchReque
         return;
 
     m_reply->setParent(this);
-    connect(m_reply, SIGNAL(finished()), this, SLOT(replyFinished()));
+    connect(m_reply, &QNetworkReply::finished, this, &QPlaceSearchReplyGooglemaps::replyFinished);
 }
 
 QPlaceSearchReplyGooglemaps::~QPlaceSearchReplyGooglemaps()

@@ -52,7 +52,7 @@ QPlaceSearchSuggestionReplyImpl::QPlaceSearchSuggestionReplyImpl(QNetworkReply *
         return;
 
     m_reply->setParent(this);
-    connect(m_reply, SIGNAL(finished()), this, SLOT(replyFinished()));
+    connect(m_reply, &QNetworkReply::finished, this, &QPlaceSearchSuggestionReplyImpl::replyFinished);
 }
 
 QPlaceSearchSuggestionReplyImpl::~QPlaceSearchSuggestionReplyImpl()

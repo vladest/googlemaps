@@ -108,9 +108,8 @@ QGeoRouteReply* QGeoRoutingManagerEngineGooglemaps::calculateRoute(const QGeoRou
 
     QGeoRouteReplyGooglemaps *routeReply = new QGeoRouteReplyGooglemaps(reply, request, this);
 
-    connect(routeReply, SIGNAL(finished()), this, SLOT(replyFinished()));
-    connect(routeReply, SIGNAL(error(QGeoRouteReply::Error,QString)),
-            this, SLOT(replyError(QGeoRouteReply::Error,QString)));
+    connect(routeReply, &QGeoRouteReplyGooglemaps::finished, this, &QGeoRoutingManagerEngineGooglemaps::replyFinished);
+    connect(routeReply, &QGeoRouteReplyGooglemaps::errorOccurred, this, &QGeoRoutingManagerEngineGooglemaps::replyError);
 
     return routeReply;
 }
