@@ -1,7 +1,13 @@
 TEMPLATE = lib
 CONFIG += plugin
 CONFIG += relative_qt_rpath  # Qt's plugins should be relocatable
+
+android {
+TARGET = plugins_geoservices_qtgeoservices_googlemaps
+} else {
 TARGET = qtgeoservices_googlemaps
+}
+
 PLUGIN_TYPE = geoservices
 PLUGIN_CLASS_NAME = QGeoServiceProviderFactoryGooglemaps
 target.path = $$[QT_INSTALL_PLUGINS]/$$PLUGIN_TYPE
