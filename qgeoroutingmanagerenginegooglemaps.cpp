@@ -36,7 +36,7 @@ QGeoRouteReply* QGeoRoutingManagerEngineGooglemaps::calculateRoute(const QGeoRou
 
     if (m_apiKey.isEmpty()) {
         QGeoRouteReply *reply = new QGeoRouteReply(QGeoRouteReply::UnsupportedOptionError, "Set googlemaps.route.apikey with google maps application key, supporting directions", this);
-        emit error(reply, reply->error(), reply->errorString());
+        emit errorOccurred(reply, reply->error(), reply->errorString());
         return reply;
     }
 
@@ -108,9 +108,8 @@ QGeoRouteReply* QGeoRoutingManagerEngineGooglemaps::calculateRoute(const QGeoRou
 
     QGeoRouteReplyGooglemaps *routeReply = new QGeoRouteReplyGooglemaps(reply, request, this);
 
-    connect(routeReply, SIGNAL(finished()), this, SLOT(replyFinished()));
-    connect(routeReply, SIGNAL(error(QGeoRouteReply::Error,QString)),
-            this, SLOT(replyError(QGeoRouteReply::Error,QString)));
+    connect(routeReply, &QGeoRouteReplyGooglemaps::finished, this, &QGeoRoutingManagerEngineGooglemaps::replyFinished);
+    connect(routeReply, &QGeoRouteReplyGooglemaps::errorOccurred, this, &QGeoRoutingManagerEngineGooglemaps::replyError);
 
     return routeReply;
 }
@@ -127,5 +126,5 @@ void QGeoRoutingManagerEngineGooglemaps::replyError(QGeoRouteReply::Error errorC
 {
     QGeoRouteReply *reply = qobject_cast<QGeoRouteReply *>(sender());
     if (reply)
-        emit error(reply, errorCode, errorString);
+        emit errorOccurred(reply, errorCode, errorString);
 }

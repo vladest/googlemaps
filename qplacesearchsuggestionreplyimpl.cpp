@@ -52,7 +52,7 @@ QPlaceSearchSuggestionReplyImpl::QPlaceSearchSuggestionReplyImpl(QNetworkReply *
         return;
 
     m_reply->setParent(this);
-    connect(m_reply, SIGNAL(finished()), this, SLOT(replyFinished()));
+    connect(m_reply, &QNetworkReply::finished, this, &QPlaceSearchSuggestionReplyImpl::replyFinished);
 }
 
 QPlaceSearchSuggestionReplyImpl::~QPlaceSearchSuggestionReplyImpl()
@@ -69,7 +69,7 @@ void QPlaceSearchSuggestionReplyImpl::setError(QPlaceReply::Error error_,
                                                const QString &errorString)
 {
     QPlaceReply::setError(error_, errorString);
-    emit error(error_, errorString);
+    emit errorOccurred(error_, errorString);
     setFinished(true);
     emit finished();
 }
@@ -90,7 +90,7 @@ void QPlaceSearchSuggestionReplyImpl::replyFinished()
     QJsonDocument document = QJsonDocument::fromJson(m_reply->readAll());
     if (!document.isObject()) {
         setError(ParseError, QCoreApplication::translate(NOKIA_PLUGIN_CONTEXT_NAME, PARSE_ERROR));
-        emit error(error(), errorString());
+        emit errorOccurred(error(), errorString());
         return;
     }
 

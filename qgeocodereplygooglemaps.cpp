@@ -30,9 +30,8 @@ static bool checkAddressType(const QJsonObject &jsonAddress, const QString &type
 QGeoCodeReplyGooglemaps::QGeoCodeReplyGooglemaps(QNetworkReply *reply, QObject *parent)
     :   QGeoCodeReply(parent), m_reply(reply)
 {
-    connect(m_reply, SIGNAL(finished()), this, SLOT(networkReplyFinished()));
-    connect(m_reply, SIGNAL(error(QNetworkReply::NetworkError)),
-            this, SLOT(networkReplyError(QNetworkReply::NetworkError)));
+    connect(m_reply, &QNetworkReply::finished, this, &QGeoCodeReplyGooglemaps::networkReplyFinished);
+    connect(m_reply, &QNetworkReply::errorOccurred, this, &QGeoCodeReplyGooglemaps::networkReplyError);
 
     setLimit(1);
     setOffset(0);
@@ -91,7 +90,7 @@ void QGeoCodeReplyGooglemaps::networkReplyFinished()
                     QGeoRectangle r;
                     r.setTopRight(constructCoordiante(jaddressRanges.value("northeast").toObject()));
                     r.setBottomLeft(constructCoordiante(jaddressRanges.value("southwest").toObject()));
-                    location.setBoundingBox(r);
+                    location.setBoundingShape(r);
                 }
 
                 QJsonArray jaddress = o.value("address_components").toArray();
